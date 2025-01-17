@@ -13,16 +13,16 @@
 - 文字搜视频（会给出符合描述的视频片段）
 - 以图搜视频（通过视频截图搜索所在片段）
 - 图文相似度计算（只是给出一个分数，用处不大）
-- Pexels视频搜索
 
 ## 部署说明
 
 ### Windows整合包
 
-[在这里下载整合包](https://github.com/chn-lee-yumi/MaterialSearch/releases/latest)`MaterialSearchWindows.zip
-`，解压后请阅读里面的`使用说明.txt`。
+[在这里下载整合包](https://github.com/chn-lee-yumi/MaterialSearch/releases/latest)`MaterialSearchWindows.7z`或`MaterialSearchWindowsLarge.7z`，解压后请阅读里面的`使用说明.txt`。
 
-整合包自带`OFA-Sys/chinese-clip-vit-base-patch16`模型。
+`MaterialSearchWindows.7z`整合包自带`OFA-Sys/chinese-clip-vit-base-patch16`模型。`MaterialSearchWindowsLarge.7z`整合包则是`OFA-Sys/chinese-clip-vit-large-patch14-336px`模型。
+
+一般而言`OFA-Sys/chinese-clip-vit-base-patch16`模型已经足够日常使用，如果效果不佳并且显卡显存足够大（8G以上），可以尝试`MaterialSearchWindowsLarge.7z`整合包。
 
 ### 通过源码部署
 
@@ -88,12 +88,6 @@ https_proxy=http://127.0.0.1:7070
 
 注意：`ASSETS_PATH`不推荐设置为远程目录（如SMB/NFS），可能会导致扫描速度变慢。
 
-## Pexels视频搜索功能说明
-
-[下载数据库](https://pan.baidu.com/s/1eeJtLtLmMJ388CE0b25_DQ?pwd=CHNL)并解压到仓库的根目录，然后重启程序。然后你就能搜索Pexels视频了。
-
-注意：该数据库用的是`OFA-Sys/chinese-clip-vit-base-patch16`模型，如果你用了其他模型，则无法使用该功能。
-
 ## 问题解答
 
 如遇问题，请先仔细阅读本文档。如果找不到答案，请在issue中搜索是否有类似问题。如果没有，可以新开一个issue，**详细说明你遇到的问题，加上你做过的尝试和思考，附上报错内容和截图，并说明你使用的系统（Windows/Linux/MacOS）和你的配置（配置在执行`main.py`的时候会打印出来）**。
@@ -118,11 +112,12 @@ https_proxy=http://127.0.0.1:7070
 
 ## 已知问题
 
-1. 部分图片和视频无法在网页上显示，原因是浏览器不支持这一类型的文件（例如tiff文件，svq3编码的视频等）。
-2. 搜视频时，如果显示的视频太多且视频体积太大，电脑可能会卡，这是正常现象。建议搜索视频时不要超过12个。
+1. 部分视频无法在网页上显示，原因是浏览器不支持这一类型的文件（例如svq3编码的视频）。
+2. 点击图片进行放大时，部分图片无法显示，原因是浏览器不支持这一类型的文件（例如tiff格式的图片）。小图可以正常显示，因为转换成缩略图的时候使用了浏览器支持的格式。大图使用的是原文件。
+3. 搜视频时，如果显示的视频太多且视频体积太大，电脑可能会卡，这是正常现象。建议搜索视频时不要超过12个。
 
 ## 关于PR
 
 欢迎提PR！不过为了避免无意义的劳动，建议先提issue讨论一下。
 
-提PR前请确保代码已经格式化。
+提PR前请确保代码已经格式化，并执行`api_test.py`确保所有测试都能通过。

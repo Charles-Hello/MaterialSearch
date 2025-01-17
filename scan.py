@@ -18,6 +18,7 @@ from database import (
 from models import create_tables, DatabaseSession
 from process_assets import process_images, process_video
 from search import clean_cache
+from utils import get_file_hash
 
 
 class Scanner:
@@ -27,6 +28,7 @@ class Scanner:
 
     def __init__(self) -> None:
         # 全局变量
+        self.scanned = False  # 表示本次自动扫描时间段内是否以及扫描过
         self.is_scanning = False
         self.scan_start_time = 0
         self.scanning_files = 0
@@ -137,10 +139,14 @@ class Scanner:
         """
         while True:
             time.sleep(5)
-            if self.is_scanning or not self.is_current_auto_scan_time():
-                continue
-            self.logger.info("触发自动扫描")
-            self.scan(True)
+            if self.is_scanning:
+                self.scanned = True  # 设置扫描标记，这样如果手动扫描在自动扫描时间段内结束，也不会重新扫描
+            elif not self.is_current_auto_scan_time():
+                self.scanned = False  # 已经过了自动扫描时间段，重置扫描标记
+            elif not self.scanned and self.is_current_auto_scan_time():
+                self.logger.info("触发自动扫描")
+                self.scanned = True  # 表示本目标时间段内已进行扫描，防止同个时间段内扫描多次
+                self.scan(True)
 
     def scan_dir(self):
         """
@@ -155,13 +161,13 @@ class Scanner:
 
     def handle_image_batch(self, session, image_batch_dict):
         path_list, features_list = process_images(list(image_batch_dict.keys()))
-        if not path_list:
+        if not path_list or features_list is None:
             return
         for path, features in zip(path_list, features_list):
             # 写入数据库
             features = features.tobytes()
-            modify_time = image_batch_dict[path]
-            add_image(session, path, modify_time, features)
+            modify_time, checksum = image_batch_dict[path]
+            add_image(session, path, modify_time, checksum, features)
             self.assets.remove(path)
         self.total_images = get_image_count(session)
 
@@ -192,25 +198,34 @@ class Scanner:
                 if not os.path.isfile(path):
                     continue
                 modify_time = os.path.getmtime(path)
-                modify_time = datetime.datetime.fromtimestamp(modify_time)
-                # 如果数据库里有这个文件，并且修改时间一致，则跳过，否则进行预处理并入库
+                checksum = None
+                if ENABLE_CHECKSUM:  # 如果启用checksum则用checksum
+                    checksum = get_file_hash(path)
+                try:  # 尝试把modify_time转换成datetime用来写入数据库
+                    modify_time = datetime.datetime.fromtimestamp(modify_time)
+                except Exception as e:  # 如果无法转换修改日期，则改为checksum
+                    self.logger.warning("文件修改日期有问题：", path, modify_time, "导致datetime转换报错", repr(e))
+                    modify_time = None
+                    if not checksum:
+                        checksum = get_file_hash(path)
+                # 如果数据库里有这个文件，并且没有发生变化，则跳过，否则进行预处理并入库
                 if path.lower().endswith(IMAGE_EXTENSIONS):  # 图片
-                    not_modified = delete_image_if_outdated(session, path)
+                    not_modified = delete_image_if_outdated(session, path, modify_time, checksum)
                     if not_modified:
                         self.assets.remove(path)
                         continue
-                    image_batch_dict[path] = modify_time
+                    image_batch_dict[path] = (modify_time, checksum)
                     # 达到SCAN_PROCESS_BATCH_SIZE再进行批量处理
                     if len(image_batch_dict) == SCAN_PROCESS_BATCH_SIZE:
                         self.handle_image_batch(session, image_batch_dict)
                         image_batch_dict = {}
                     continue
                 elif path.lower().endswith(VIDEO_EXTENSIONS):  # 视频
-                    not_modified = delete_video_if_outdated(session, path)
+                    not_modified = delete_video_if_outdated(session, path, modify_time, checksum)
                     if not_modified:
                         self.assets.remove(path)
                         continue
-                    add_video(session, path, modify_time, process_video(path))
+                    add_video(session, path, modify_time, checksum, process_video(path))
                     self.total_video_frames = get_video_frame_count(session)
                     self.total_videos = get_video_count(session)
                 self.assets.remove(path)

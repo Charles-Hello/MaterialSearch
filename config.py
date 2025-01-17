@@ -1,9 +1,8 @@
 import os
 
-from dotenv import load_dotenv
+from env import *
 
-# 加载.env文件中的环境变量
-load_dotenv()
+env()
 
 # *****服务器配置*****
 HOST = os.getenv('HOST', '0.0.0.0')  # 监听IP，如果只想本地访问，把这个改成127.0.0.1
@@ -20,7 +19,7 @@ FRAME_INTERVAL = int(os.getenv('FRAME_INTERVAL', 2))  # 视频每隔多少秒取
 SCAN_PROCESS_BATCH_SIZE = int(os.getenv('SCAN_PROCESS_BATCH_SIZE', 8))  # 等读取的帧数到这个数量后再一次性输入到模型中进行批量计算，从而提高效率。显存较大可以调高这个值。
 IMAGE_MIN_WIDTH = int(os.getenv('IMAGE_MIN_WIDTH', 64))  # 图片最小宽度，小于此宽度则忽略。不需要可以改成0。
 IMAGE_MIN_HEIGHT = int(os.getenv('IMAGE_MIN_HEIGHT', 64))  # 图片最小高度，小于此高度则忽略。不需要可以改成0。
-AUTO_SCAN = os.getenv('AUTO_SCAN', 'False').lower() == 'true'  # 是否自动扫描，如果开启，则会在指定时间内进行扫描
+AUTO_SCAN = os.getenv('AUTO_SCAN', 'False').lower() == 'true'  # 是否自动扫描，如果开启，则会在指定时间内进行扫描，每天只会扫描一次
 AUTO_SCAN_START_TIME = tuple(map(int, os.getenv('AUTO_SCAN_START_TIME', '22:30').split(':')))  # 自动扫描开始时间
 AUTO_SCAN_END_TIME = tuple(map(int, os.getenv('AUTO_SCAN_END_TIME', '8:00').split(':')))  # 自动扫描结束时间
 AUTO_SAVE_INTERVAL = int(os.getenv('AUTO_SAVE_INTERVAL', 100))  # 扫描自动保存间隔，默认为每 100 个文件自动保存一次
@@ -57,11 +56,17 @@ ENABLE_LOGIN = os.getenv('ENABLE_LOGIN', 'False').lower() == 'true'  # 是否启
 USERNAME = os.getenv('USERNAME', 'admin')  # 登录用户名
 PASSWORD = os.getenv('PASSWORD', 'MaterialSearch')  # 登录密码
 FLASK_DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'  # flask 调试开关（热重载）
+ENABLE_CHECKSUM = os.getenv('ENABLE_CHECKSUM', 'False').lower() == 'true'  # 是否启用文件校验（如果是，则通过文件校验来判断文件是否更新，否则通过修改时间判断）
 
 # *****打印配置内容*****
 print("********** 运行配置 / RUNNING CONFIGURATIONS **********")
 global_vars = globals().copy()
 for var_name, var_value in global_vars.items():
+    if "i" in var_name and "I" in var_name: continue
     if var_name[0].isupper():
         print(f"{var_name}: {var_value!r}")
+print(f"HF_HOME: {os.getenv('HF_HOME')}")
+print(f"HF_HUB_OFFLINE: {os.getenv('HF_HUB_OFFLINE')}")
+print(f"TRANSFORMERS_OFFLINE: {os.getenv('TRANSFORMERS_OFFLINE')}")
+print(f"CWD: {os.getcwd()}")
 print("**************************************************")

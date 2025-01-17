@@ -13,7 +13,6 @@ Online Demo：https://chn-lee-yumi.github.io/MaterialSearchWebDemo/
 - Text-based video search (provides matching video clips based on descriptions)
 - Image-based video search (searches for video segments based on screenshots)
 - Calculation of image-text similarity (provides a score, not very useful)
-- Pexels video search
 
 ## Deploy Instructions
 
@@ -81,12 +80,6 @@ https_proxy=http://127.0.0.1:7070
 
 Note: It is no recommended to set `ASSETS_PATH` as remote directory such as SMB/NFS, which may slow your scanning speed.
 
-## Pexels Video Search Functionality Instructions
-
-[Download the database](https://drive.google.com/file/d/1LZAI7QuTxiNgLzpp_6s5zIQdwb9AlxQ1/view?usp=sharing) and unzip to the root directory of this repo, and then restart the program. Then you can search Pexels videos.
-
-Note: This database uses `OFA-Sys/chinese-clip-vit-base-patch16` model. If you use other models, this function will not work correctly.
-
 ## Troubleshooting
 
 If you encounter any issues, please read this documentation carefully first. If you cannot find an answer, search the issues to see if there are similar problems. If not, you can open a new issue and provide detailed information about the problem, including your attempted solutions and thoughts, error messages and screenshots, and the system you are using (Windows/Linux/MacOS) and the configuration (which will be printed while running `main.py`).
@@ -111,8 +104,9 @@ Increasing the search threshold can speed up searching speed. On a J3455 CPU, wh
 
 ## Known Issues
 
-1. Some images and videos cannot be displayed on the web page because the browser does not support that file type (such as TIFF files, videos encoded with SVQ3, etc.).
-2. When searching for videos, if too many videos are displayed and the video size is too large, the computer may freeze, which is normal. So it is suggested that do not select more than 12 results when you searching videos.
+1. Some videos cannot be displayed on the web page because the browser does not support that file type (e.g. videos encoded with SVQ3).
+2. When you click on an image to enlarge it, some images cannot be displayed because the browser does not support this type of file (e.g. images in tiff format). Small images can be displayed normally because they are converted into thumbnails in a format supported by the browser. Large images use the original file.
+3. When searching for videos, if too many videos are displayed and the video size is too large, the computer may freeze, which is normal. So it is suggested that do not select more than 12 results when you searching videos.
 
 ## About Pull Requests
 
