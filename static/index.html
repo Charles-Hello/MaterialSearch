@@ -42,6 +42,9 @@
         <el-button-group v-if="!isScanning">
             <el-button round type="primary" size="default" @click="scan">{{ $t("buttons.scan") }}</el-button>
         </el-button-group>
+        <el-button-group v-if="isScanning">
+            <el-button round type="danger" size="default" @click="stopScan">{{ $t("buttons.stop") || "Stop" }}</el-button>
+        </el-button-group>
         <!--<el-button-group>-->
         <!--    <el-button round type="warning" size="small" @click="cleanCache">{{ $t("buttons.cleanCache") }}</el-button>-->
         <!--</el-button-group>-->
@@ -70,7 +73,7 @@
                                 <el-option label="Top 30" value="30"></el-option>
                                 <el-option label="Top 150" value="150"></el-option>
                                 <el-option label="Top 600" value="600"></el-option>
-                                <el-option :label="$t('formPlaceholders.topnAll')" value="1000000"></el-option>
+                                <el-option :label="$t('formPlaceholders.topnAll')" value="0"></el-option>
                             </el-select>
                             <el-button type="success" icon="Search" @click="search(0)">{{ $t('searchButtons.search') }}</el-button>
                             <el-button type="primary" icon="DocumentCopy" @click="copyAllPaths">{{ $t('messages.copyAllPaths') }}</el-button>
@@ -115,7 +118,7 @@
                                 <el-option label="Top 30" value="30"></el-option>
                                 <el-option label="Top 150" value="150"></el-option>
                                 <el-option label="Top 600" value="600"></el-option>
-                                <el-option :label="$t('formPlaceholders.topnAll')" value="1000000"></el-option>
+                                <el-option :label="$t('formPlaceholders.topnAll')" value="0"></el-option>
                             </el-select>
                             <el-button type="success" icon="Search" @click="search(1)">{{ $t('searchButtons.search') }}</el-button>
                             <el-button type="success" icon="Pointer" @click="pasteImg">{{ $t('searchButtons.paste') }}</el-button>
@@ -152,7 +155,7 @@
                                 <el-option label="Top 30" value="30"></el-option>
                                 <el-option label="Top 150" value="150"></el-option>
                                 <el-option label="Top 600" value="600"></el-option>
-                                <el-option :label="$t('formPlaceholders.topnAll')" value="1000000"></el-option>
+                                <el-option :label="$t('formPlaceholders.topnAll')" value="0"></el-option>
                             </el-select>
                             <el-button type="success" icon="Search" @click="search(2)">{{ $t('searchButtons.search') }}</el-button>
                             <el-button type="primary" icon="DocumentCopy" @click="copyAllPaths">{{ $t('messages.copyAllPaths') }}</el-button>
@@ -197,7 +200,7 @@
                                 <el-option label="Top 30" value="30"></el-option>
                                 <el-option label="Top 150" value="150"></el-option>
                                 <el-option label="Top 600" value="600"></el-option>
-                                <el-option :label="$t('formPlaceholders.topnAll')" value="1000000"></el-option>
+                                <el-option :label="$t('formPlaceholders.topnAll')" value="0"></el-option>
                             </el-select>
                             <el-button type="success" icon="Search" @click="search(3)">{{ $t('searchButtons.search') }}</el-button>
                             <el-button type="success" icon="Pointer" @click="pasteImg">{{ $t('searchButtons.paste') }}</el-button>
@@ -402,6 +405,19 @@ const app = Vue.createApp({
             axios.get('api/scan')
                 .then(function(response) {
                     console.log(response);
+                    that.loadData();
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    ElementPlus.ElMessage.error(error.response.data);
+                })
+        },
+        stopScan() {
+            var that = this;
+            axios.post('/api/stop')
+                .then(function(response) {
+                    console.log(response);
+                    ElementPlus.ElMessage.success(that.$t('messages.stopScan'));
                     that.loadData();
                 })
                 .catch(function(error) {
