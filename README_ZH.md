@@ -2,6 +2,8 @@
 
 [**中文**](./README_ZH.md) | [**English**](./README.md)
 
+[**赞助项目**](https://github.com/sponsors/chn-lee-yumi)
+
 扫描本地的图片以及视频，并且可以用自然语言进行查找。
 
 本仓库现仅包含本项目的前端代码。核心逻辑已独立封装为一个 pip 包，并托管在另一个仓库（[materialsearch-core](https://github.com/chn-lee-yumi/MaterialSearch-core)），以便更好地管理版本与分发，并且方便大家进行直接调用和开发。

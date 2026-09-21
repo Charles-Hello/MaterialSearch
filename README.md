@@ -2,6 +2,8 @@
 
 [**中文**](./README_ZH.md) | [**English**](./README.md)
 
+[**Sponsor this project**](https://github.com/sponsors/chn-lee-yumi)
+
 Search local photos and videos through natural language.
 
 This repository now contains only the front-end code of the project. The core logic has been separated into a standalone pip package, which is hosted in another repository: [materialsearch-core](https://github.com/chn-lee-yumi/MaterialSearch-core). This structure makes version control and distribution easier, and also allows developers to use the core functions directly in their own projects.
